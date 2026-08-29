@@ -68,20 +68,36 @@ public_users.get('/isbn/:isbn', async function (req, res) {
         res.status(404).json({ message: "Book not found" });
     }
 });
+
+
   
 // Get book details based on author
-public_users.get('/author/:author', function (req, res) {
+
+public_users.get('/books/author/:author', function (req, res) {
     const author = req.params.author;
-    const keys = Object.keys(books);
     const result = {};
 
-    keys.forEach((key) => {
+    Object.keys(books).forEach((key) => {
         if (books[key].author === author) {
             result[key] = books[key];
         }
     });
 
-    res.send(JSON.stringify(result, null, 2));
+    res.json(result);
+});
+
+public_users.get('/author/:author', async function (req, res) {
+    const author = req.params.author;
+
+    try {
+        const response = await axios.get(
+            `http://localhost:5000/books/author/${encodeURIComponent(author)}`
+        );
+
+        res.send(JSON.stringify(response.data, null, 2));
+    } catch (error) {
+        res.status(404).json({ message: "Books not found" });
+    }
 });
 
 // Get all books based on title
